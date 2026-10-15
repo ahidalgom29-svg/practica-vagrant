@@ -38,4 +38,7 @@ El archivo `Vagrantfile` está escrito en **Ruby** (utilizando su sintaxis de DS
 | `vagrant provision` | Reejecuta los scripts de aprovisionamiento. | [x] |
 | `vagrant halt` | Apaga de forma controlada la VM. | [x] |
 | `vagrant destroy` | Elimina completamente la VM y sus recursos. | [x] |
+
+
+
 El directorio `/vagrant` dentro de la VM es una carpeta compartida (*Synced Folder*) que mapea en tiempo real el directorio del proyecto situado en el anfitrión.
