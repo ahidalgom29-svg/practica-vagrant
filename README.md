@@ -8,9 +8,9 @@
 - **Proveedor (Provider)**: Motor de virtualización encargado de gestionar las máquinas virtuales (ej. VirtualBox, VMware).
 # Práctica: Despliegue de entorno virtualizado con Vagrant
 
-**Estudiante:** Ángel Hidalgo Morales  
-**Curso:** 2º ASIR  
-**Centro:** IES Albarregas  
+**Estudiante:** Ángel Hidalgo Morales
+**Curso:** 2º ASIR
+**Centro:** IES Albarregas 
 
 ---
 
@@ -130,7 +130,7 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
   config.vm.provision "shell", path: "setup_apache.sh"
 end
-
+```
 ---
 
 ### 2. Análisis de las Interfaces de Red y Rutas en Debian
