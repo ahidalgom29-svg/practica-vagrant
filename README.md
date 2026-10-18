@@ -116,3 +116,48 @@ El archivo `Vagrantfile` está escrito en **Ruby** (utilizando su sintaxis de DS
 
 
 El directorio `/vagrant` dentro de la VM es una carpeta compartida (*Synced Folder*) que mapea en tiempo real el directorio del proyecto situado en el anfitrión.
+
+## Parte C: Configuración Completa del Vagrantfile
+
+### 1. Definición de la Infraestructura en Código
+Se ha configurado el archivo `Vagrantfile` para incluir el hostname personalizado, la segunda interfaz en red interna, el reenvío del puerto web y el aprovisionamiento automatizado:
+
+```ruby
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+  config.vm.hostname = "servidor-debian-angel"
+  config.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "red-laboratorio"
+  config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  config.vm.provision "shell", path: "setup_apache.sh"
+end
+
+---
+
+### 2. Análisis de las Interfaces de Red y Rutas en Debian
+
+Tras aplicar los cambios con vagrant reload y acceder por SSH (vagrant ssh), se verificó la asignación de red:
+
+- Primera Interfaz (eth0 - NAT):
+  - Dirección y ruta: Recibe la IP 10.0.2.15/24 vía DHCP y asigna la ruta predeterminada default via 10.0.2.2 dev eth0.
+  - Función: Proporciona salida a Internet a la VM y permite la gestión SSH administrativa desde el anfitrión.
+- Segunda Interfaz (eth1 - Red de laboratorio):
+  - Dirección: Configurada estáticamente en 192.168.56.10/24.
+  - Función: Permite la comunicación en la red interna aislada red-laboratorio.
+
+---
+
+### 3. Diferencia entre Red Interna (VirtualBox) y Red Host-Only (VMware)
+
+- Red Interna (Intnet en VirtualBox): Aísla el tráfico exclusivamente entre las máquinas virtuales conectadas a esa misma etiqueta de red. El sistema operativo anfitrión no tiene acceso directo por IP a esta interfaz.
+- Red Privada Host-Only (en VMware): Crea una tarjeta de red virtual en el equipo anfitrión que le permite comunicarse directamente por IP con las máquinas virtuales, actuando como una red privada local entre el anfitrión y los invitados.
+
+---
+
+### 4. Reenvío de Puertos y Aprovisionamiento
+- Forwarded Port: Mapea las peticiones dirigidas al puerto 8080 de la interfaz local del anfitrión (127.0.0.1) hacia el puerto 80 del servidor web en la VM.
+- Provisioner: Asocia el script externo setup_apache.sh para automatizar el despliegue de Apache.
+
+---
+
+### 5. Evidencia Fotográfica
+![Verificación de Interfaces y Rutas de Red](img/01_verificacion_sistema_red.png)
