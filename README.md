@@ -6,7 +6,81 @@
 - **Vagrant**: Herramienta CLI para la creación y gestión de entornos de desarrollo virtualizados de forma reproducible y portable. Resuelve el problema del *"en mi equipo funciona"* encapsulando la infraestructura en código.
 - **Anfitrión (Host)**: Sistema operativo base donde se ejecuta Vagrant y el hypervisor.
 - **Proveedor (Provider)**: Motor de virtualización encargado de gestionar las máquinas virtuales (ej. VirtualBox, VMware).
-- **Box**: Plantilla empaquetada o imagen base del sistema operativo utilizada como punto de partida.
+# Práctica: Despliegue de entorno virtualizado con Vagrant
+
+**Estudiante:** Ángel Hidalgo Morales  
+**Curso:** 2º ASIR  
+**Centro:** IES Albarregas  
+
+---
+
+## Parte A: Investigación Teórica
+
+### 1. Vagrant y el Vagrantfile
+
+#### Problema que resuelve Vagrant
+Vagrant permite automatizar la creación y gestión de entornos de desarrollo reproducibles mediante código (Infrastructure as Code), eliminando el problema de "en mi máquina funciona".
+
+#### Conceptos clave
+- Vagrant: Herramienta de línea de comandos para la creación y gestión de entornos virtuales.
+- Anfitrión (Host): Sistema operativo base donde se ejecuta Vagrant y el hipervisor.
+- Proveedor (Provider): Motor de virtualización encargado de gestionar las máquinas virtuales (VirtualBox).
+- Box: Plantilla empaquetada o imagen base inmutable del sistema operativo (debian/bookworm64).
+- Máquina Virtual (Guest): Instancia aislada generada sobre el proveedor.
+
+#### Lenguaje y análisis del Vagrantfile
+El archivo Vagrantfile está escrito en Ruby (sintaxis DSL).
+
+Bloque de configuración del Vagrantfile:
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+  config.vm.hostname = "servidor-debian-angel"
+  config.vm.network "private_network", ip: "192.168.56.10", virtualbox__intnet: "red-laboratorio"
+  config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  config.vm.provision "shell", path: "setup_apache.sh"
+end
+
+- config.vm.box: Define la imagen base (Debian 12). Comprobación: cat /etc/os-release.
+- config.vm.hostname: Define el nombre de host de la VM. Comprobación: hostname.
+- config.vm.network "private_network": Asigna una red interna aislada con IP fija (192.168.56.10). Comprobación: ip -brief addr.
+- config.vm.network "forwarded_port": Mapea el puerto 8080 del anfitrión al 80 de la VM para acceder al servidor web. Comprobación: Navegar a http://127.0.0.1:8080.
+- config.vm.provision: Ejecuta el script de aprovisionamiento setup_apache.sh. Comprobación: systemctl status apache2.
+
+---
+
+### 2. Aprovisionamiento (Provisioning)
+
+- Provisioner: Mecanismo para automatizar la instalación y configuración del software dentro de la VM con permisos de root.
+- inline: vs path:: inline: ejecuta comandos escritos dentro del propio Vagrantfile. path: ejecuta un script externo en un archivo separado (setup_apache.sh).
+- Reejecución del script: Si se modifica el script tras el primer vagrant up, los cambios no se aplican solos; hay que ejecutar vagrant provision.
+
+---
+
+### 3. Interfaces y Redes
+
+- Red por defecto (NAT): Vagrant la crea automáticamente en la interfaz eth0 para dotar a la VM de acceso a Internet y permitir la conexión SSH administrativa. Añadir una segunda interfaz no elimina la NAT.
+- Comparativa de redes:
+  - NAT: Acceso a Internet, aislada del host y de otras VMs.
+  - Red Interna (Intnet): Comunicación directa entre VMs de la misma red física virtualizada. Sin acceso a la red física ni al host.
+  - Red Privada (Host-Only): Comunicación entre la VM y el host.
+  - Red Pública (Bridged): La VM se integra como un equipo más en la red física del anfitrión.
+- VirtualBox vs VMware: La red interna de VirtualBox aísla el tráfico entre VMs sin darle IP directa al host; la red host-only de VMware sí conecta directamente al host con la VM.
+- Forwarded Ports: Redirige puertos concretos sobre la interfaz NAT existente; no genera una interfaz nueva.
+
+---
+
+### 4. Órdenes y Carpeta Compartida
+
+Tabla de comandos:
+- vagrant up: Despliega y arranca la máquina virtual. [Ejecutado: Sí]
+- vagrant status: Muestra el estado actual de la VM. [Ejecutado: Sí]
+- vagrant ssh: Abre una terminal interactiva por SSH. [Ejecutado: Sí]
+- vagrant reload: Reinicia la VM aplicando cambios del Vagrantfile. [Ejecutado: Sí]
+- vagrant provision: Ejecuta de nuevo los scripts de aprovisionamiento. [Ejecutado: Sí]
+- vagrant halt: Apaga la VM de forma limpia. [Ejecutado: Sí]
+- vagrant destroy: Elimina la VM y sus recursos en disco. [Ejecutado: Sí]
+
+- Carpeta /vagrant: Es un directorio sincronizado automáticamente (Synced Folder) entre la raíz del proyec- **Box**: Plantilla empaquetada o imagen base del sistema operativo utilizada como punto de partida.
 - **Máquina Virtual (Guest)**: Instancia aislada generada sobre el proveedor.
 
 
