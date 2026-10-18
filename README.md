@@ -31,7 +31,9 @@ Vagrant permite automatizar la creación y gestión de entornos de desarrollo re
 #### Lenguaje y análisis del Vagrantfile
 El archivo Vagrantfile está escrito en Ruby (sintaxis DSL).
 
-Bloque de configuración del Vagrantfile:
+**Bloque de configuración del Vagrantfile:**
+
+```ruby
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/bookworm64"
   config.vm.hostname = "servidor-debian-angel"
@@ -39,6 +41,7 @@ Vagrant.configure("2") do |config|
   config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
   config.vm.provision "shell", path: "setup_apache.sh"
 end
+```
 
 - config.vm.box: Define la imagen base (Debian 12). Comprobación: cat /etc/os-release.
 - config.vm.hostname: Define el nombre de host de la VM. Comprobación: hostname.
