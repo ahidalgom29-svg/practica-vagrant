@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
-# Actualizar repositorios e instalar Apache2
 apt-get update -y
 apt-get install -y apache2
 
-# Habilitar e iniciar el servicio
 systemctl enable apache2
 systemctl start apache2
 
-# Crear la página de inicio personalizada
 cat <<EOF > /var/www/html/index.html
 <!DOCTYPE html>
 <html lang="es">

@@ -161,3 +161,64 @@ Tras aplicar los cambios con vagrant reload y acceder por SSH (vagrant ssh), se 
 
 ### 5. Evidencia Fotográfica
 ![Verificación de Interfaces y Rutas de Red](img/01_verificacion_sistema_red.png)
+
+
+## Parte D: Aprovisionamiento Automatizado del Servidor Apache
+
+### 1. Script de Aprovisionamiento (setup_apache.sh)
+Para automatizar la instalación y configuración del servidor web, se ha desarrollado el script Bash setup_apache.sh:
+
+#!/usr/bin/env bash
+# Actualizar la lista de paquetes e instalar el servidor web Apache2
+apt-get update -y
+apt-get install -y apache2
+
+# Habilitar y arrancar el servicio de Apache
+systemctl enable apache2
+systemctl start apache2
+
+# Crear la página web index.html personalizada con variables del sistema
+cat <<EOF> /var/www/html/index.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Servidor Web Vagrant</title>
+</head>
+<body>
+    <h1>Servidor Apache Desplegado con Éxito</h1>
+    <p><b>Estudiante:</b> Ángel Hidalgo Morales</p>
+    <p><b>Hostname:</b> $(hostname)</p>
+    <p><b>Dirección IP:</b> $(hostname -I)</p>
+</body>
+</html>
+EOF
+
+---
+
+### 2. Explicación de las Órdenes del Script
+1. apt-get update -y: Actualiza los repositorios de paquetes de Debian sin solicitar interacción.
+2. apt-get install -y apache2: Instala el servidor HTTP Apache.
+3. systemctl enable apache2: Registra el servicio para que se inicie automáticamente en cada arranque de la máquina.
+4. systemctl start apache2: Inicia el servicio de inmediato.
+5. cat <<EOF > /var/www/html/index.html: Sustituye la página por defecto de Apache con una estructura HTML personalizada que lee dinámicamente el hostname y las IP asignadas mediante la ejecución de comandos en el script.
+
+---
+
+### 3. Reejecución Exclusiva del Aprovisionamiento
+Si se modifica el script de aprovisionamiento o la configuración del servidor web con la máquina ya en marcha, no es necesario destruirla ni reiniciarla. Vagrant permite forzar la ejecución del aprovisionador mediante la orden:
+
+vagrant provision
+
+---
+
+### 4. Evidencias Fotográficas y Verificación
+
+#### A) Salida del comando vagrant provision
+![Ejecución de vagrant provision](img/03_vagrant_provision.png)
+
+#### B) Estado del servicio dentro de la máquina virtual
+![Estado del servicio Apache2](img/04_estado_apache.png)
+
+#### C) Acceso al servidor web desde el anfitrión
+![Acceso web desde el navegador](img/05_navegador_anfitrion.png)
