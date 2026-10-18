@@ -168,7 +168,7 @@ Tras aplicar los cambios con vagrant reload y acceder por SSH (vagrant ssh), se 
 ### 1. Script de Aprovisionamiento (setup_apache.sh)
 Para automatizar la instalación y configuración del servidor web, se ha desarrollado el script Bash setup_apache.sh:
 
-``bash
+```bash
 #!/usr/bin/env bash
 # Actualizar la lista de paquetes e instalar el servidor web Apache2
 apt-get update -y
